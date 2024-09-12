@@ -41,9 +41,9 @@ BEGIN
     -- ngược lại month=month
     -- Bước 2: Xóa dữ liệu bảng fact_report_xh, fact_report_tong_hop_raw tại month_key, fact_temp,fact_report_tong_hop 
     -- Bước 3: insert dữ liệu vào bảng fact_temp
-    -- Bước 4: insert dữ liệu vào bảng fact_report_month
+    -- Bước 4: insert dữ liệu vào bảng fact_head_value 
 	-- Bước 5: insert dữ liệu vào bảng fact_report_tong_hop_raw
-	-- Bước 6: insert dữ liệu vào bnảg fact_report_tong_hop
+	-- Bước 6: insert dữ liệu vào bnảg fact_report_xh 
     ---------------------------
     -- CHI TIẾT CÁC BƯỚC
     -- Bước 1: Kiểm tra dữ liệu truyền
@@ -158,6 +158,7 @@ insert into du_no_sau_wo (area,kpi_month ,du_no_ck,du_no_nhom_1,du_no_nhom_2,du_
 	and kpi_month >= 202301
 	group by x.kpi_month,y.ma_khu_vuc  ;
 -- tạo table lưu giá trị head cần phân bổ
+-- Bước 4: insert dữ liệu vào fact_head_value 
  insert into fact_head_value(sort_id, value)
 -- sort_id 14 ( lãi trong hạn ) với account_code thuộc : 702000030002, 702000030001,702000030102
 	select 
@@ -345,7 +346,7 @@ insert into fact_head_value(sort_id, value)
 	from 
 		fact_head_value
 	where sort_id between 7 and 9;
---insert fact_report_tong_hop_raw
+--Bước 5: insert fact_report_tong_hop_raw
 --insert sort_id 14->18
 	insert into fact_report_tong_hop_raw (month,sort_id,area_name,value)
 	select 
@@ -468,7 +469,7 @@ insert into fact_head_value(sort_id, value)
 	join amount_area c on c.area_code=a.area_code
 	join area_code d on d.area_code=a.area_code)) a)
 	union all 
-	(-- Tính amount chưa phân bổ của từng khu vực theo tiêu chí sort_id =17
+	(
 	select 
 		vmonth_key as month,
 		17 as sort_id,
@@ -1084,7 +1085,7 @@ insert into fact_head_value(sort_id, value)
 	from fact_report_tong_hop a 
 	join dim_report_tong_hop b on a.sort_id=b.sort_id 
 	left join fact_head_value c on c.sort_id =a.sort_id ;
---insert bang fact_report_xh 
+--Bước 6: insert bang fact_report_xh 
 	INSERT INTO fact_report_xh(
     month_key, area_code, area_name, email, tong_diem, rank_final, 
     ltn_avg, rank_ltn_avg, psdn_avg, rank_psdn_avg, approval_rate_avg, 
@@ -1233,7 +1234,7 @@ insert into fact_head_value(sort_id, value)
 end;
 $$;
 -- Declare variables and array
-DO $$ 
+/*(DO $$ 
 DECLARE
     m int;
     n int;
@@ -1277,5 +1278,5 @@ begin
                 area_array[m]);
         END LOOP;
     END LOOP;
-END $$;
+END $$;*/
 call report_monthly(2);
